@@ -1,0 +1,50 @@
+{
+  "pins" : [
+    {
+      "identity" : "clifoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/henrik-dmg/CLIFoundation",
+      "state" : {
+        "branch" : "main",
+        "revision" : "2b3c42960cb11d38bb91497a2b5606ae530b1f8f"
+      }
+    },
+    {
+      "identity" : "globpattern",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/GlobPattern",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c7c3d7864b24543343d7cac9a27fab4ad17410a2"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "c8ed701b513cf5177118a175d85fbbbcd707ab41",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swift-docc-plugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-docc-plugin",
+      "state" : {
+        "revision" : "26ac5758409154cc448d7ab82389c520fa8a8247",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swift-docc-symbolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-docc-symbolkit",
+      "state" : {
+        "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}

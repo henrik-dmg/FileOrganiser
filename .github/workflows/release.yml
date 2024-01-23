@@ -1,0 +1,32 @@
+name: Deployment
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  distribute_binaries:
+    runs-on: macos-13
+    strategy:
+      matrix:
+        platform: [arm64, x86_64]
+    steps:
+      - name: Configure Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Compile ${{ matrix.platform }} Binary
+        run: |
+          swift build -c release --arch ${{ matrix.platform }}
+          zip -j file-organiser-${{ matrix.platform }}.zip .build/${{ matrix.platform }}-apple-macosx/release/file-organiser
+      - name: Upload ${{ matrix.platform }} Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: file-organiser-${{ matrix.platform }}.zip
+          asset_name: file-organiser-${{ matrix.platform }}.zip
+          asset_content_type: application/zip
