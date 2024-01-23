@@ -30,6 +30,8 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+      - name: Checkout Code
+        uses: actions/checkout@v3
       - name: Install SwiftLint
         run: brew install swift-format peripheryapp/periphery/periphery
       - name: Lint code
