@@ -46,11 +46,13 @@ public class Logger {
         case .move:
             logMessage =
                 options.contains(.parseableOutput)
-                ? "MOVE |> \(sourcePath) -> \(destinationPath)" : "Moved file from \(sourcePath) to \(destinationPath)"
+                ? "MOVE |> \(sourcePath) -> \(destinationPath)"
+                : "Moved file from \(sourcePath) to \(destinationPath)"
         case .copy:
             logMessage =
                 options.contains(.parseableOutput)
-                ? "COPY |> \(sourcePath) -> \(destinationPath)" : "Copied file from \(sourcePath) to \(destinationPath)"
+                ? "COPY |> \(sourcePath) -> \(destinationPath)"
+                : "Copied file from \(sourcePath) to \(destinationPath)"
         }
 
         printVerbose(logMessage)
@@ -63,11 +65,13 @@ public class Logger {
         case .move:
             logMessage =
                 options.contains(.parseableOutput)
-                ? "MOVE |> \(sourcePath) -> \(destinationPath)" : "Would move file from \(sourcePath) to \(destinationPath)"
+                ? "MOVE |> \(sourcePath) -> \(destinationPath)"
+                : "Would move file from \(sourcePath) to \(destinationPath)"
         case .copy:
             logMessage =
                 options.contains(.parseableOutput)
-                ? "COPY |> \(sourcePath) -> \(destinationPath)" : "Would copy file from \(sourcePath) to \(destinationPath)"
+                ? "COPY |> \(sourcePath) -> \(destinationPath)"
+                : "Would copy file from \(sourcePath) to \(destinationPath)"
         }
 
         printer.writeDefault(logMessage)
