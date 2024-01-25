@@ -19,7 +19,7 @@ extension CustomParsableCommand {
         }
 
         let logger = Logger(options: loggerOptions)
-        let fileHandler = FileHandler()
+        let fileHandler = FileHandler(logger: logger)
 
         do {
             try Organiser(fileHandler: fileHandler, logger: logger)
@@ -30,8 +30,7 @@ extension CustomParsableCommand {
                     fileStrategy: strategy,
                     dateStrategy: options.dateStrategy,
                     dryRun: options.dryRun,
-                    shouldSoftFail: options.softFail,
-                    useExifMetadataIfPossible: options.useExifMetadata
+                    shouldSoftFail: options.softFail
                 )
         } catch let error as NSError {
             logger.logError(message: error.localizedDescription)

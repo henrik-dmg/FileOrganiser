@@ -54,10 +54,8 @@ public class Organiser {
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool,
-        shouldSoftFail: Bool,
-        useExifMetadataIfPossible: Bool
+        shouldSoftFail: Bool
     ) throws {
-        let startTime = DispatchTime.now()
         let result = try processWithResult(
             sourceURL: sourceURL,
             destinationURL: destinationURL,
@@ -65,15 +63,9 @@ public class Organiser {
             fileStrategy: fileStrategy,
             dateStrategy: dateStrategy,
             dryRun: dryRun,
-            shouldSoftFail: shouldSoftFail,
-            useExifMetadataIfPossible: useExifMetadataIfPossible
+            shouldSoftFail: shouldSoftFail
         )
-        let endTime = DispatchTime.now()
 
-        let elapsedTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
-        let elapsedTimeInMilliSeconds = Double(elapsedTime) / 1_000_000.0
-
-        print("Elapsed", UInt64(elapsedTimeInMilliSeconds), "ms")  // TODO: Remove before merging
         logger.logSummary(
             dryRun: dryRun,
             filesProcessed: result.filesProcessed,
@@ -90,8 +82,7 @@ public class Organiser {
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool,
-        shouldSoftFail: Bool,
-        useExifMetadataIfPossible: Bool
+        shouldSoftFail: Bool
     ) throws -> DirectoryProcessingResult {
         let glob: Glob.Pattern?
         if let globPattern, !globPattern.isEmpty {
@@ -123,8 +114,7 @@ public class Organiser {
                 destination: destinationURL,
                 fileStrategy: fileStrategy,
                 dateStrategy: dateStrategy,
-                dryRun: dryRun,
-                useExifMetadataIfPossible: useExifMetadataIfPossible
+                dryRun: dryRun
             )
 
             switch processingResult {
@@ -159,10 +149,9 @@ public class Organiser {
         destination: URL,
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
-        dryRun: Bool,
-        useExifMetadataIfPossible: Bool
+        dryRun: Bool
     ) throws -> FileProcessingResult {
-        guard let fileAttributes = try fileHandler.resourceValues(of: url, useExifMetadataIfPossible: useExifMetadataIfPossible),
+        guard let fileAttributes = try fileHandler.resourceValues(of: url),
             fileAttributes.isRegularFileOrPackage
         else {
             return .notRegularFile

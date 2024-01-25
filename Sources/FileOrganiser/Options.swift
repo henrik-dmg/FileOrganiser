@@ -40,9 +40,6 @@ struct Options: ParsableArguments {
     )
     var parseableOutput = false
 
-    @Flag(help: "Attempt to read EXIF metadata from image files to determine creation date. Will decrease processing speed")
-    var useExifMetadata = false
-
     @Flag(inversion: .prefixedNo, help: "Enables or disables colored output")
     var coloredOutput = true
 

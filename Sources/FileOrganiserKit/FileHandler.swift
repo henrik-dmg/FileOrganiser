@@ -7,7 +7,7 @@ import ImageIO
 public protocol FileHandlerProtocol {
 
     func doesFileExist(at url: URL) -> Bool
-    func resourceValues(of url: URL, useExifMetadataIfPossible: Bool) throws -> FileAttributes?
+    func resourceValues(of url: URL) throws -> FileAttributes?
 
     func copyItem(at source: URL, to target: URL) throws
     func moveItem(at source: URL, to target: URL) throws
@@ -41,9 +41,15 @@ public struct FileHandler: FileHandlerProtocol {
         }
     }
 
+    // MARK: - Properties
+
+    private let logger: Logger
+
     // MARK: - Init
 
-    public init() {}
+    public init(logger: Logger) {
+        self.logger = logger
+    }
 
     // MARK: - Methods
 
@@ -51,24 +57,8 @@ public struct FileHandler: FileHandlerProtocol {
         FileManager.default.fileExists(atPath: url.path)
     }
 
-    public func resourceValues(of url: URL, useExifMetadataIfPossible: Bool) throws -> FileAttributes? {
-        var fileAttributes = try FileAttributes(url: url)
-
-        guard useExifMetadataIfPossible, fileAttributes.isRegularFileOrPackage else {
-            return fileAttributes
-        }
-
-        do {
-            let exifMetadata = try ExifParser.exifMetadata(ofFile: url)
-            fileAttributes.photoCreationDate = exifMetadata.captureDate
-            return fileAttributes
-        } catch {
-            guard error is ExifParser.ParserError else {
-                throw error
-            }
-            print(error.localizedDescription.addingTerminalColor(.yellow))
-            return fileAttributes
-        }
+    public func resourceValues(of url: URL) throws -> FileAttributes? {
+        try FileAttributes(url: url)
     }
 
     public func copyItem(at source: URL, to target: URL) throws {

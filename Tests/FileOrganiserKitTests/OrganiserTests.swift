@@ -247,7 +247,8 @@ final class OrganiserTests: XCTestCase {
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool,
-        fileHandler: FileHandlerProtocol
+        fileHandler: FileHandlerProtocol,
+        shouldSoftFail: Bool = false
     ) throws -> Organiser.DirectoryProcessingResult {
         let logger = Logger(options: [.verbose, .parseableOutput], printer: try makePrinter())
         let organiser = Organiser(fileHandler: fileHandler, logger: logger)
@@ -258,8 +259,7 @@ final class OrganiserTests: XCTestCase {
             fileStrategy: fileStrategy,
             dateStrategy: dateStrategy,
             dryRun: dryRun,
-            shouldSoftFail: false,
-            useExifMetadataIfPossible: false
+            shouldSoftFail: shouldSoftFail
         )
     }
 

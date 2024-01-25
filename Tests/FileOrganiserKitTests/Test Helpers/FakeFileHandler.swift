@@ -20,7 +20,7 @@ class FakeFileHandler: FileHandlerProtocol {
         return doesFileExistHandler(url)
     }
 
-    func resourceValues(of url: URL, useExifMetadataIfPossible: Bool) throws -> FileAttributes? {
+    func resourceValues(of url: URL) throws -> FileAttributes? {
         guard let resourceValuesHandler else {
             XCTFail("resourceValuesHandler should be set")
             return nil

@@ -10,7 +10,7 @@ final class FileHandlerTests: TemporaryFileTests {
     func testFileHandler_CreatestTemporaryDirectory() throws {
         let folderURL = temporaryDirectory.appendingPathComponent("some-subfolder", conformingTo: .folder)
 
-        let handler = FileHandler()
+        let handler = FileHandler(logger: Logger(options: .verbose))
         try handler.createDirectory(at: folderURL)
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: folderURL.path))
@@ -21,7 +21,7 @@ final class FileHandlerTests: TemporaryFileTests {
 
         try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
 
-        let handler = FileHandler()
+        let handler = FileHandler(logger: Logger(options: .verbose))
         XCTAssertTrue(handler.doesFileExist(at: folderURL))
     }
 
@@ -39,7 +39,7 @@ final class FileHandlerTests: TemporaryFileTests {
         try FileManager.default.createDirectory(at: targetURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try "some-content".write(to: sourceURL, atomically: true, encoding: .utf8)
 
-        let handler = FileHandler()
+        let handler = FileHandler(logger: Logger(options: .verbose))
         try handler.copyItem(at: sourceURL, to: targetURL)
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: sourceURL.path))
@@ -60,7 +60,7 @@ final class FileHandlerTests: TemporaryFileTests {
         try FileManager.default.createDirectory(at: targetURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try "some-content".write(to: sourceURL, atomically: true, encoding: .utf8)
 
-        let handler = FileHandler()
+        let handler = FileHandler(logger: Logger(options: .verbose))
         try handler.moveItem(at: sourceURL, to: targetURL)
 
         XCTAssertFalse(FileManager.default.fileExists(atPath: sourceURL.path))
@@ -72,11 +72,70 @@ final class FileHandlerTests: TemporaryFileTests {
 
         try "some-content".write(to: sourceURL, atomically: true, encoding: .utf8)
 
-        let handler = FileHandler()
-        let attributes = try XCTUnwrap(try handler.resourceValues(of: sourceURL, useExifMetadataIfPossible: false))
+        let handler = FileHandler(logger: Logger(options: .verbose))
+        let attributes = try XCTUnwrap(try handler.resourceValues(of: sourceURL))
 
         XCTAssertTrue(attributes.isRegularFileOrPackage)
         XCTAssertTrue((attributes.fileSizeInBytes ?? 0) > 0)
+    }
+
+    func testFileHandler_EnumeratesDirectory() throws {
+        let sourceURL =
+            temporaryDirectory
+            .appendingPathComponent("source", conformingTo: .folder)
+            .appendingPathComponent("text.txt", conformingTo: .text)
+        let targetURL =
+            temporaryDirectory
+            .appendingPathComponent("target", conformingTo: .folder)
+            .appendingPathComponent("text.txt", conformingTo: .plainText)
+
+        try FileManager.default.createDirectory(at: sourceURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: targetURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try "some-content".write(to: sourceURL, atomically: true, encoding: .utf8)
+        try "some-content".write(to: targetURL, atomically: true, encoding: .utf8)
+
+        var enumeratedFiles = Set<String>()
+
+        let handler = FileHandler(logger: Logger(options: .verbose))
+        try handler.contentsOfDirectory(
+            at: temporaryDirectory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles, .producesRelativePathURLs],
+            shouldSoftFail: false
+        ) { url in
+            enumeratedFiles.insert(url.relativePath)
+        } softFailCallback: { error in
+            XCTFail(error.localizedDescription)
+        }
+
+        XCTAssertEqual(enumeratedFiles.count, 4)
+        XCTAssertEqual(enumeratedFiles, Set(["target", "target/text.txt", "source", "source/text.txt"]))
+    }
+
+    func testFileHandler_ShouldSoftFail() throws {
+        let sourceURL =
+            temporaryDirectory
+            .appendingPathComponent("source", conformingTo: .folder)
+            .appendingPathComponent("text.txt", conformingTo: .text)
+
+        try FileManager.default.createDirectory(at: sourceURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try "some-content".write(to: sourceURL, atomically: true, encoding: .utf8)
+
+        var hasThrownError = false
+
+        let handler = FileHandler(logger: Logger(options: .verbose))
+        try handler.contentsOfDirectory(
+            at: temporaryDirectory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles, .producesRelativePathURLs],
+            shouldSoftFail: true
+        ) { url in
+            throw NSError(domain: "dev.panhans.FileOrganiserKitTests", code: 1000)
+        } softFailCallback: { error in
+            hasThrownError = true
+        }
+
+        XCTAssertTrue(hasThrownError)
     }
 
 }
