@@ -24,23 +24,17 @@ public class Logger {
     // MARK: - Properties
 
     let options: Options
-    var output: TextOutputStream
-    var errorOutput: TextOutputStream
+    let printer: Printer
 
     // MARK: - Init
 
     public convenience init(options: Options) {
-        self.init(options: options, output: FileHandleOutputStream(.standardOutput), errorOutput: FileHandleOutputStream(.standardError))
+        self.init(options: options, printer: Printer(outputFileHandle: .standardOutput, errorFileHandle: .standardError))
     }
 
-    init(
-        options: Options,
-        output: TextOutputStream,
-        errorOutput: TextOutputStream
-    ) {
+    init(options: Options, printer: Printer) {
         self.options = options
-        self.output = output
-        self.errorOutput = errorOutput
+        self.printer = printer
     }
 
     // MARK: - Methods
@@ -76,7 +70,7 @@ public class Logger {
                 ? "COPY |> \(sourcePath) -> \(destinationPath)" : "Would copy file from \(sourcePath) to \(destinationPath)"
         }
 
-        print(logMessage, to: &output)
+        printer.writeDefault(logMessage)
     }
 
     public func logFileSkipped(at url: URL, reason: String) {
@@ -100,7 +94,7 @@ public class Logger {
                 SUCCESS |> Processed \(filesProcessed) files.
                         |> Dry run completed. No files were moved or copied.
                 """
-            print(logMessage.addingTerminalStyling(color: options.contains(.coloredOutput) ? .green : nil), to: &output)
+            printer.writeDefault(logMessage.addingTerminalStyling(color: options.contains(.coloredOutput) ? .green : nil))
         } else {
             let formatter = ByteCountFormatter()
             let bytesWrittenString = formatter.string(fromByteCount: Int64(bytesWritten))
@@ -108,29 +102,26 @@ public class Logger {
                 SUCCESS |> Processed \(filesProcessed) files.
                         |> Files written: \(filesWritten) files (\(bytesWrittenString)). \(filesSkipped) files skipped.
                 """
-            print(logMessage.addingTerminalStyling(color: options.contains(.coloredOutput) ? .green : nil), to: &output)
+            printer.writeDefault(logMessage.addingTerminalStyling(color: options.contains(.coloredOutput) ? .green : nil))
         }
     }
 
     public func logError(message: String) {
-        print("ERROR |> \(message)".addingTerminalStyling(color: options.contains(.coloredOutput) ? .red : nil), to: &errorOutput)
+        printer.writeError("ERROR |> \(message)".addingTerminalStyling(color: options.contains(.coloredOutput) ? .red : nil))
     }
 
     public func logSoftError(message: String) {
-        print("NON-FATAL |> \(message)".addingTerminalStyling(color: options.contains(.coloredOutput) ? .red : nil), to: &errorOutput)
+        printer.writeError("NON-FATAL |> \(message)".addingTerminalStyling(color: options.contains(.coloredOutput) ? .red : nil))
     }
 
     // MARK: - Helpers
 
-    private func printVerbose(_ args: Any...) {
+    private func printVerbose(_ string: String) {
         guard options.contains(.verbose) else {
             return
         }
 
-        let printString = args.map {
-            String(describing: $0)
-        }
-        print(printString, separator: " ", to: &output)
+        printer.writeDefault(string)
     }
 
 }
