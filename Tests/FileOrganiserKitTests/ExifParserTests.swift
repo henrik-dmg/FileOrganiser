@@ -1,6 +1,6 @@
+import AppKit
 import Foundation
 import XCTest
-import AppKit
 
 @testable import FileOrganiserKit
 
