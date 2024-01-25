@@ -39,6 +39,9 @@ let package = Package(
             name: "FileOrganiserKitTests",
             dependencies: [
                 "FileOrganiserKit"
+            ],
+            resources: [
+                .copy("Resources")
             ]
         ),
         .executableTarget(

@@ -40,7 +40,7 @@ struct ExifParser {
 
     private static let alternativeDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy   :MM:dd HH:mm:ss"
+        formatter.dateFormat = "yyyy:MM:dd HH:mm:ss"
         return formatter
     }()
 
@@ -57,6 +57,7 @@ struct ExifParser {
             throw ParserError(path: fileURL.relativePath, reason: .noExifProperties)
         }
         guard let captureDateString = exif["DateTimeOriginal"] as? String, !captureDateString.isEmpty else {
+            print(exif)
             throw ParserError(path: fileURL.relativePath, reason: .noCaptureDate)
         }
         guard let captureDate = dateFormatter.date(from: captureDateString) ?? alternativeDateFormatter.date(from: captureDateString) else {
