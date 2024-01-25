@@ -1,12 +1,13 @@
 import Foundation
 import GlobPattern
+import ImageIO
 
 // MARK: - Protocol
 
 public protocol FileHandlerProtocol {
 
     func doesFileExist(at url: URL) -> Bool
-    func resourceValues(of url: URL) throws -> FileAttributes?
+    func resourceValues(of url: URL, useExifMetadataIfPossible: Bool) throws -> FileAttributes?
 
     func copyItem(at source: URL, to target: URL) throws
     func moveItem(at source: URL, to target: URL) throws
@@ -50,9 +51,24 @@ public struct FileHandler: FileHandlerProtocol {
         FileManager.default.fileExists(atPath: url.path)
     }
 
-    public func resourceValues(of url: URL) throws -> FileAttributes? {
-        let resourceValues = try url.resourceValues(forKeys: FileAttributes.urlResourceKeys)
-        return try FileAttributes(values: resourceValues)
+    public func resourceValues(of url: URL, useExifMetadataIfPossible: Bool) throws -> FileAttributes? {
+        var fileAttributes = try FileAttributes(url: url)
+
+        guard useExifMetadataIfPossible, fileAttributes.isRegularFileOrPackage else {
+            return fileAttributes
+        }
+
+        do {
+            let exifMetadata = try ExifParser.exifMetadata(ofFile: url)
+            fileAttributes.photoCreationDate = exifMetadata.captureDate
+            return fileAttributes
+        } catch {
+            guard error is ExifParser.ParserError else {
+                throw error
+            }
+            print(error.localizedDescription.addingTerminalColor(.yellow))
+            return fileAttributes
+        }
     }
 
     public func copyItem(at source: URL, to target: URL) throws {

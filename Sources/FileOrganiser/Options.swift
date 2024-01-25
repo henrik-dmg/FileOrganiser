@@ -35,4 +35,15 @@ struct Options: ParsableArguments {
     @Flag(help: "Keeps the tool running when a failure occurs for individual files")
     var softFail = false
 
+    @Flag(
+        help: "Enables a more parseable output format. See https://github.com/henrik-dmg/FileOrganiser#output-format for more information"
+    )
+    var parseableOutput = false
+
+    @Flag(help: "Attempt to read EXIF metadata from image files to determine creation date. Will decrease processing speed")
+    var useExifMetadata = false
+
+    @Flag(inversion: .prefixedNo, help: "Enables or disables colored output")
+    var coloredOutput = true
+
 }

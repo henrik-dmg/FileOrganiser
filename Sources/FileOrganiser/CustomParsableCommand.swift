@@ -7,8 +7,19 @@ protocol CustomParsableCommand: ParsableCommand {}
 extension CustomParsableCommand {
 
     func runOrganiser(strategy: FileHandlingStrategy, options: Options) throws {
-        let logger: LoggerProtocol = Logger(verbose: options.verbose)
-        let fileHandler: FileHandlerProtocol = FileHandler()
+        var loggerOptions = Logger.Options()
+        if options.coloredOutput {
+            loggerOptions.insert(.coloredOutput)
+        }
+        if options.verbose {
+            loggerOptions.insert(.verbose)
+        }
+        if options.parseableOutput {
+            loggerOptions.insert(.parseableOutput)
+        }
+
+        let logger = Logger(options: loggerOptions)
+        let fileHandler = FileHandler()
 
         do {
             try Organiser(fileHandler: fileHandler, logger: logger)
@@ -19,7 +30,8 @@ extension CustomParsableCommand {
                     fileStrategy: strategy,
                     dateStrategy: options.dateStrategy,
                     dryRun: options.dryRun,
-                    shouldSoftFail: options.softFail
+                    shouldSoftFail: options.softFail,
+                    useExifMetadataIfPossible: options.useExifMetadata
                 )
         } catch let error as NSError {
             logger.logError(message: error.localizedDescription)

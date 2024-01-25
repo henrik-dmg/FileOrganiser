@@ -36,11 +36,11 @@ public class Organiser {
     // MARK: - Properties
 
     private let fileHandler: FileHandlerProtocol
-    private let logger: LoggerProtocol
+    private let logger: Logger
 
     // MARK: - Init
 
-    public init(fileHandler: FileHandlerProtocol, logger: LoggerProtocol) {
+    public init(fileHandler: FileHandlerProtocol, logger: Logger) {
         self.fileHandler = fileHandler
         self.logger = logger
     }
@@ -54,8 +54,10 @@ public class Organiser {
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool,
-        shouldSoftFail: Bool
+        shouldSoftFail: Bool,
+        useExifMetadataIfPossible: Bool
     ) throws {
+        let startTime = DispatchTime.now()
         let result = try processWithResult(
             sourceURL: sourceURL,
             destinationURL: destinationURL,
@@ -63,8 +65,15 @@ public class Organiser {
             fileStrategy: fileStrategy,
             dateStrategy: dateStrategy,
             dryRun: dryRun,
-            shouldSoftFail: shouldSoftFail
+            shouldSoftFail: shouldSoftFail,
+            useExifMetadataIfPossible: useExifMetadataIfPossible
         )
+        let endTime = DispatchTime.now()
+
+        let elapsedTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+        let elapsedTimeInMilliSeconds = Double(elapsedTime) / 1_000_000.0
+
+        print("Elapsed", UInt64(elapsedTimeInMilliSeconds), "ms")  // TODO: Remove before merging
         logger.logSummary(
             dryRun: dryRun,
             filesProcessed: result.filesProcessed,
@@ -81,7 +90,8 @@ public class Organiser {
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool,
-        shouldSoftFail: Bool
+        shouldSoftFail: Bool,
+        useExifMetadataIfPossible: Bool
     ) throws -> DirectoryProcessingResult {
         let glob: Glob.Pattern?
         if let globPattern, !globPattern.isEmpty {
@@ -113,7 +123,8 @@ public class Organiser {
                 destination: destinationURL,
                 fileStrategy: fileStrategy,
                 dateStrategy: dateStrategy,
-                dryRun: dryRun
+                dryRun: dryRun,
+                useExifMetadataIfPossible: useExifMetadataIfPossible
             )
 
             switch processingResult {
@@ -148,13 +159,16 @@ public class Organiser {
         destination: URL,
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
-        dryRun: Bool
+        dryRun: Bool,
+        useExifMetadataIfPossible: Bool
     ) throws -> FileProcessingResult {
-        guard let fileAttributes = try fileHandler.resourceValues(of: url) else {
+        guard let fileAttributes = try fileHandler.resourceValues(of: url, useExifMetadataIfPossible: useExifMetadataIfPossible),
+            fileAttributes.isRegularFileOrPackage
+        else {
             return .notRegularFile
         }
 
-        let subFolderPath = fileAttributes.creationDate.path(for: dateStrategy)
+        let subFolderPath = (fileAttributes.photoCreationDate ?? fileAttributes.creationDate).path(for: dateStrategy)
         let subFolderURL = destination.appendingPathComponent(subFolderPath, isDirectory: true)
         let targetFileURL = subFolderURL.appendingPathComponent(url.lastPathComponent)
 
