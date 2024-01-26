@@ -19,7 +19,7 @@ extension CustomParsableCommand {
         }
 
         let logger = Logger(options: loggerOptions)
-        let fileHandler = FileHandler(logger: logger)
+        let fileHandler = FileHandler()
 
         do {
             try Organiser(fileHandler: fileHandler, logger: logger)

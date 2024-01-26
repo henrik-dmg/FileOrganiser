@@ -250,7 +250,7 @@ final class OrganiserTests: XCTestCase {
         fileHandler: FileHandlerProtocol,
         shouldSoftFail: Bool = false
     ) throws -> Organiser.DirectoryProcessingResult {
-        let logger = Logger(options: [.verbose, .parseableOutput], printer: try makePrinter())
+        let logger = Logger(options: [.verbose, .parseableOutput], printer: try Printer.makeFake())
         let organiser = Organiser(fileHandler: fileHandler, logger: logger)
         return try organiser.processWithResult(
             sourceURL: fileStructure.sourceURL,
@@ -261,18 +261,6 @@ final class OrganiserTests: XCTestCase {
             dryRun: dryRun,
             shouldSoftFail: shouldSoftFail
         )
-    }
-
-    private func makePrinter() throws -> Printer {
-        let fakeOutput = FileManager.default.temporaryDirectory.appendingPathComponent("FileOrganiserFakeOutput", conformingTo: .plainText)
-        if FileManager.default.fileExists(atPath: fakeOutput.path) {
-            try "".data(using: .utf8)!.write(to: fakeOutput)
-        } else {
-            FileManager.default.createFile(atPath: fakeOutput.path, contents: nil)
-        }
-
-        let fakeFileHandle = try FileHandle(forWritingTo: fakeOutput)
-        return Printer(outputFileHandle: fakeFileHandle, errorFileHandle: fakeFileHandle)
     }
 
 }

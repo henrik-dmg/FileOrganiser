@@ -41,15 +41,9 @@ public struct FileHandler: FileHandlerProtocol {
         }
     }
 
-    // MARK: - Properties
-
-    private let logger: Logger
-
     // MARK: - Init
 
-    public init(logger: Logger) {
-        self.logger = logger
-    }
+    public init() {}
 
     // MARK: - Methods
 
