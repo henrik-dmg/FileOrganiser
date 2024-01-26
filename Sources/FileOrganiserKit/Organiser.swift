@@ -6,18 +6,18 @@ public class Organiser {
 
     // MARK: - Nested Types
 
+    public struct DirectoryProcessingResult {
+        public let filesProcessed: Int
+        public let filesWritten: Int
+        public let filesSkipped: Int
+        public let bytesWritten: Int
+    }
+
     enum FileProcessingResult {
         case skipped(reason: SkipReason)
         case written(sourcePath: String, destinationPath: String, fileSize: Int?)
         case notRegularFile
         case dryRun(sourcePath: String, destinationPath: String)
-    }
-
-    struct DirectoryProcessingResult {
-        let filesProcessed: Int
-        let filesWritten: Int
-        let filesSkipped: Int
-        let bytesWritten: Int
     }
 
     enum SkipReason: String {
@@ -47,35 +47,7 @@ public class Organiser {
 
     // MARK: - Running Configurations
 
-    public func process(
-        sourceURL: URL,
-        destinationURL: URL,
-        globPattern: String?,
-        fileStrategy: FileHandlingStrategy,
-        dateStrategy: DateGroupingStrategy,
-        dryRun: Bool,
-        shouldSoftFail: Bool
-    ) throws {
-        let result = try processWithResult(
-            sourceURL: sourceURL,
-            destinationURL: destinationURL,
-            globPattern: globPattern,
-            fileStrategy: fileStrategy,
-            dateStrategy: dateStrategy,
-            dryRun: dryRun,
-            shouldSoftFail: shouldSoftFail
-        )
-
-        logger.logSummary(
-            dryRun: dryRun,
-            filesProcessed: result.filesProcessed,
-            filesWritten: result.filesWritten,
-            filesSkipped: result.filesSkipped,
-            bytesWritten: result.bytesWritten
-        )
-    }
-
-    func processWithResult(
+    public func processWithResult(
         sourceURL: URL,
         destinationURL: URL,
         globPattern: String?,
@@ -157,7 +129,7 @@ public class Organiser {
             return .notRegularFile
         }
 
-        let subFolderPath = (fileAttributes.photoCreationDate ?? fileAttributes.creationDate).path(for: dateStrategy)
+        let subFolderPath = fileAttributes.creationDate.path(for: dateStrategy)
         let subFolderURL = destination.appendingPathComponent(subFolderPath, isDirectory: true)
         let targetFileURL = subFolderURL.appendingPathComponent(url.lastPathComponent)
 

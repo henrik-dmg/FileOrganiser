@@ -25,7 +25,6 @@ public struct FileAttributes {
     public let fileSizeInBytes: Int?
     public let creationDate: Date
     public let isRegularFileOrPackage: Bool
-    public internal(set) var photoCreationDate: Date?
 
     // MARK: - Init
 
@@ -40,20 +39,17 @@ public struct FileAttributes {
         self.fileSizeInBytes = resourceValues.fileSize ?? resourceValues.totalFileSize
         self.creationDate = creationDate
         self.isRegularFileOrPackage = isRegularFile || isPackage
-        self.photoCreationDate = nil
     }
 
     #if DEBUG
         init(
             fileSizeInBytes: Int?,
             creationDate: Date,
-            isRegularFileOrPackage: Bool,
-            photoCreationDate: Date?
+            isRegularFileOrPackage: Bool
         ) {
             self.fileSizeInBytes = fileSizeInBytes
             self.creationDate = creationDate
             self.isRegularFileOrPackage = isRegularFileOrPackage
-            self.photoCreationDate = photoCreationDate
         }
     #endif
 

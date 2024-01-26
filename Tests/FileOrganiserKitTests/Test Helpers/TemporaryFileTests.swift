@@ -7,7 +7,7 @@ class TemporaryFileTests: XCTestCase {
 
     override func setUpWithError() throws {
         try super.setUpWithError()
-        temporaryDirectory = try Self.makeTemporaryDirectory()
+        temporaryDirectory = try FileManager.default.hp_makeTemporaryDirectory()
     }
 
     override func tearDownWithError() throws {
@@ -17,7 +17,12 @@ class TemporaryFileTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    private static func makeTemporaryDirectory() throws -> URL {
+}
+
+extension FileManager {
+
+    // swift-format-ignore
+    func hp_makeTemporaryDirectory() throws -> URL {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("FileOrganiser", conformingTo: .folder)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory

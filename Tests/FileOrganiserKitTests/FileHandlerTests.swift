@@ -112,6 +112,26 @@ final class FileHandlerTests: TemporaryFileTests {
         XCTAssertEqual(enumeratedFiles, Set(["target", "target/text.txt", "source", "source/text.txt"]))
     }
 
+    func testFileHandler_CantEnumerateDirectory() throws {
+        let nonExistingDirectory = URL(filePath: "some-volume/that/does/not/exist")
+            .appendingPathComponent("some-random-subfolder", conformingTo: .folder)
+            .appendingPathComponent("non-existing", conformingTo: .folder)
+
+        let handler = FileHandler()
+        XCTAssertThrowsError(
+            try handler.contentsOfDirectory(
+                at: nonExistingDirectory,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles, .producesRelativePathURLs],
+                shouldSoftFail: false
+            ) { url in
+                XCTFail("Should not call process handler")
+            } softFailCallback: { error in
+                XCTFail(error.localizedDescription)
+            }
+        )
+    }
+
     func testFileHandler_ShouldSoftFail() throws {
         let sourceURL =
             temporaryDirectory

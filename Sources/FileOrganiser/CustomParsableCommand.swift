@@ -20,18 +20,26 @@ extension CustomParsableCommand {
 
         let logger = Logger(options: loggerOptions)
         let fileHandler = FileHandler()
+        let organiser = Organiser(fileHandler: fileHandler, logger: logger)
 
         do {
-            try Organiser(fileHandler: fileHandler, logger: logger)
-                .process(
-                    sourceURL: options.source,
-                    destinationURL: options.destination,
-                    globPattern: options.filePattern,
-                    fileStrategy: strategy,
-                    dateStrategy: options.dateStrategy,
-                    dryRun: options.dryRun,
-                    shouldSoftFail: options.softFail
-                )
+            let result = try organiser.processWithResult(
+                sourceURL: options.source,
+                destinationURL: options.destination,
+                globPattern: options.filePattern,
+                fileStrategy: strategy,
+                dateStrategy: options.dateStrategy,
+                dryRun: options.dryRun,
+                shouldSoftFail: options.softFail
+            )
+
+            logger.logSummary(
+                dryRun: options.dryRun,
+                filesProcessed: result.filesProcessed,
+                filesWritten: result.filesWritten,
+                filesSkipped: result.filesSkipped,
+                bytesWritten: result.bytesWritten
+            )
         } catch let error as NSError {
             logger.logError(message: error.localizedDescription)
             Darwin.exit(Int32(error.code))

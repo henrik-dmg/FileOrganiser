@@ -75,7 +75,10 @@ public struct FileHandler: FileHandlerProtocol {
         callback: (URL) throws -> Void,
         softFailCallback: (Error) -> Void
     ) throws {
-        guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys, options: mask) else {
+        guard
+            let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys, options: mask),
+            FileManager.default.fileExists(atPath: url.path)
+        else {
             throw FileHandlerError.cantCreateEnumerator(path: url.path)
         }
 

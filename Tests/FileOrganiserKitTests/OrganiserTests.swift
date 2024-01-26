@@ -35,7 +35,7 @@ final class OrganiserTests: XCTestCase {
             false
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true, photoCreationDate: nil)
+            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTAssertEqual(url.relativePath, fakeFileStructure.destinationURL.relativePath + "/" + fakeImageCreationDate.path(for: .year))
@@ -70,7 +70,7 @@ final class OrganiserTests: XCTestCase {
             false
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true, photoCreationDate: nil)
+            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTAssertEqual(url.relativePath, fakeFileStructure.destinationURL.relativePath + "/" + fakeImageCreationDate.path(for: .year))
@@ -101,7 +101,7 @@ final class OrganiserTests: XCTestCase {
             true
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: .now, isRegularFileOrPackage: true, photoCreationDate: nil)
+            FileAttributes(fileSizeInBytes: 100, creationDate: .now, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTFail("Should not attempt to create any directories")
@@ -129,11 +129,11 @@ final class OrganiserTests: XCTestCase {
             fakeFileStructure.subDirectoryURL,
         ]
         fakeFileHandler.resourceValuesHandler = { url in
-            if url == fakeFileStructure.imageURL || url == fakeFileStructure.textFileURL {
-                FileAttributes(fileSizeInBytes: 100, creationDate: .now, isRegularFileOrPackage: true, photoCreationDate: nil)
-            } else {
-                FileAttributes(fileSizeInBytes: 100, creationDate: .now, isRegularFileOrPackage: false, photoCreationDate: nil)
-            }
+            FileAttributes(
+                fileSizeInBytes: 100,
+                creationDate: .now,
+                isRegularFileOrPackage: url == fakeFileStructure.imageURL || url == fakeFileStructure.textFileURL
+            )
         }
 
         let result = try runOrganiser(
@@ -188,7 +188,7 @@ final class OrganiserTests: XCTestCase {
             false
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true, photoCreationDate: nil)
+            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTAssertEqual(url.relativePath, fakeFileStructure.destinationURL.relativePath + "/" + fakeImageCreationDate.path(for: .year))
