@@ -8,5 +8,3 @@ if [ -f "$GIT_ROOT/.git/hooks/pre-commit" ]; then
 fi
 
 ln -s "$GIT_ROOT/Scripts/lint-swift-code" "$GIT_ROOT/.git/hooks/pre-commit"
-
-git lfs install
