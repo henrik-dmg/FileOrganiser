@@ -250,7 +250,7 @@ final class OrganiserTests: XCTestCase {
         fileHandler: FileHandlerProtocol,
         shouldSoftFail: Bool = false
     ) throws -> Organiser.DirectoryProcessingResult {
-        let logger = Logger(options: [.verbose, .parseableOutput], printer: try Printer.makeFake())
+        let logger = Logger(options: [.verbose, .skipSummary], printer: try Printer.makeFake())
         let organiser = Organiser(fileHandler: fileHandler, logger: logger)
         return try organiser.processWithResult(
             sourceURL: fileStructure.sourceURL,
