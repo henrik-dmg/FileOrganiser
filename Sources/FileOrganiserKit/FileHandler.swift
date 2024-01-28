@@ -51,8 +51,7 @@ public struct FileHandler: FileHandlerProtocol {
     }
 
     public func resourceValues(of url: URL) throws -> FileAttributes? {
-        let resourceValues = try url.resourceValues(forKeys: FileAttributes.urlResourceKeys)
-        return try FileAttributes(values: resourceValues)
+        try FileAttributes(url: url)
     }
 
     public func copyItem(at source: URL, to target: URL) throws {
@@ -75,7 +74,10 @@ public struct FileHandler: FileHandlerProtocol {
         callback: (URL) throws -> Void,
         softFailCallback: (Error) -> Void
     ) throws {
-        guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys, options: mask) else {
+        guard
+            let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys, options: mask),
+            FileManager.default.fileExists(atPath: url.path)
+        else {
             throw FileHandlerError.cantCreateEnumerator(path: url.path)
         }
 

@@ -9,6 +9,7 @@ final class OrganiserTests: XCTestCase {
 
     struct FakeFileStructure {
         let sourceURL: URL
+        let subDirectoryURL: URL
         let destinationURL: URL
         let imageURL: URL
         let textFileURL: URL
@@ -34,7 +35,7 @@ final class OrganiserTests: XCTestCase {
             false
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate)
+            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTAssertEqual(url.relativePath, fakeFileStructure.destinationURL.relativePath + "/" + fakeImageCreationDate.path(for: .year))
@@ -69,7 +70,7 @@ final class OrganiserTests: XCTestCase {
             false
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate)
+            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTAssertEqual(url.relativePath, fakeFileStructure.destinationURL.relativePath + "/" + fakeImageCreationDate.path(for: .year))
@@ -100,7 +101,7 @@ final class OrganiserTests: XCTestCase {
             true
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: .now)
+            FileAttributes(fileSizeInBytes: 100, creationDate: .now, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTFail("Should not attempt to create any directories")
@@ -125,9 +126,14 @@ final class OrganiserTests: XCTestCase {
         fakeFileHandler.fakeContentsOfDirectory = [
             fakeFileStructure.imageURL,
             fakeFileStructure.textFileURL,
+            fakeFileStructure.subDirectoryURL,
         ]
-        fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: .now)
+        fakeFileHandler.resourceValuesHandler = { url in
+            FileAttributes(
+                fileSizeInBytes: 100,
+                creationDate: .now,
+                isRegularFileOrPackage: url == fakeFileStructure.imageURL || url == fakeFileStructure.textFileURL
+            )
         }
 
         let result = try runOrganiser(
@@ -182,7 +188,7 @@ final class OrganiserTests: XCTestCase {
             false
         }
         fakeFileHandler.resourceValuesHandler = { _ in
-            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate)
+            FileAttributes(fileSizeInBytes: 100, creationDate: fakeImageCreationDate, isRegularFileOrPackage: true)
         }
         fakeFileHandler.createDirectoryHandler = { url in
             XCTAssertEqual(url.relativePath, fakeFileStructure.destinationURL.relativePath + "/" + fakeImageCreationDate.path(for: .year))
@@ -221,11 +227,13 @@ final class OrganiserTests: XCTestCase {
 
     private func makeFakeFileStructure() -> FakeFileStructure {
         let fakeSourceURL = URL(filePath: "/some/directory")
+        let fakeSubDirectoryURL = fakeSourceURL.appendingPathComponent("subdirectory")
         let fakeDestinationURL = URL(filePath: "/some/other-directory")
         let fakeImageURL = fakeSourceURL.appendingPathComponent("mypicture", conformingTo: .jpeg)
-        let fakeTextURL = fakeSourceURL.appendingPathComponent("subdirectory").appendingPathComponent("token", conformingTo: .text)
+        let fakeTextURL = fakeSubDirectoryURL.appendingPathComponent("token", conformingTo: .text)
         return FakeFileStructure(
             sourceURL: fakeSourceURL,
+            subDirectoryURL: fakeSubDirectoryURL,
             destinationURL: fakeDestinationURL,
             imageURL: fakeImageURL,
             textFileURL: fakeTextURL
@@ -239,9 +247,11 @@ final class OrganiserTests: XCTestCase {
         fileStrategy: FileHandlingStrategy,
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool,
-        fileHandler: FileHandlerProtocol
+        fileHandler: FileHandlerProtocol,
+        shouldSoftFail: Bool = false
     ) throws -> Organiser.DirectoryProcessingResult {
-        let organiser = Organiser(fileHandler: fileHandler, logger: FakeLogger())
+        let logger = Logger(options: [.verbose, .skipSummary], printer: try Printer.makeFake())
+        let organiser = Organiser(fileHandler: fileHandler, logger: logger)
         return try organiser.processWithResult(
             sourceURL: fileStructure.sourceURL,
             destinationURL: fileStructure.destinationURL,
@@ -249,7 +259,7 @@ final class OrganiserTests: XCTestCase {
             fileStrategy: fileStrategy,
             dateStrategy: dateStrategy,
             dryRun: dryRun,
-            shouldSoftFail: false
+            shouldSoftFail: shouldSoftFail
         )
     }
 

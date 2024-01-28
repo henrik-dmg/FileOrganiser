@@ -6,18 +6,18 @@ public class Organiser {
 
     // MARK: - Nested Types
 
+    public struct DirectoryProcessingResult {
+        public let filesProcessed: Int
+        public let filesWritten: Int
+        public let filesSkipped: Int
+        public let bytesWritten: Int
+    }
+
     enum FileProcessingResult {
         case skipped(reason: SkipReason)
         case written(sourcePath: String, destinationPath: String, fileSize: Int?)
         case notRegularFile
         case dryRun(sourcePath: String, destinationPath: String)
-    }
-
-    struct DirectoryProcessingResult {
-        let filesProcessed: Int
-        let filesWritten: Int
-        let filesSkipped: Int
-        let bytesWritten: Int
     }
 
     enum SkipReason: String {
@@ -36,45 +36,18 @@ public class Organiser {
     // MARK: - Properties
 
     private let fileHandler: FileHandlerProtocol
-    private let logger: LoggerProtocol
+    private let logger: Logger
 
     // MARK: - Init
 
-    public init(fileHandler: FileHandlerProtocol, logger: LoggerProtocol) {
+    public init(fileHandler: FileHandlerProtocol, logger: Logger) {
         self.fileHandler = fileHandler
         self.logger = logger
     }
 
     // MARK: - Running Configurations
 
-    public func process(
-        sourceURL: URL,
-        destinationURL: URL,
-        globPattern: String?,
-        fileStrategy: FileHandlingStrategy,
-        dateStrategy: DateGroupingStrategy,
-        dryRun: Bool,
-        shouldSoftFail: Bool
-    ) throws {
-        let result = try processWithResult(
-            sourceURL: sourceURL,
-            destinationURL: destinationURL,
-            globPattern: globPattern,
-            fileStrategy: fileStrategy,
-            dateStrategy: dateStrategy,
-            dryRun: dryRun,
-            shouldSoftFail: shouldSoftFail
-        )
-        logger.logSummary(
-            dryRun: dryRun,
-            filesProcessed: result.filesProcessed,
-            filesWritten: result.filesWritten,
-            filesSkipped: result.filesSkipped,
-            bytesWritten: result.bytesWritten
-        )
-    }
-
-    func processWithResult(
+    public func processWithResult(
         sourceURL: URL,
         destinationURL: URL,
         globPattern: String?,
@@ -121,11 +94,21 @@ public class Organiser {
                 logger.logFileSkipped(at: url, reason: reason.description)
                 filesSkipped += 1
             case .written(let sourcePath, let destinationPath, let fileSize):
-                logger.logFileWritten(sourcePath: sourcePath, destinationPath: destinationPath, fileStrategy: fileStrategy)
+                logger.logFileAction(
+                    sourcePath: sourcePath,
+                    destinationPath: destinationPath,
+                    fileStrategy: fileStrategy,
+                    isDryRun: dryRun
+                )
                 filesWritten += 1
                 bytesWritten += fileSize ?? 0
             case .dryRun(let sourcePath, let destinationPath):
-                logger.logDryRun(sourcePath: sourcePath, destinationPath: destinationPath, fileStrategy: fileStrategy)
+                logger.logFileAction(
+                    sourcePath: sourcePath,
+                    destinationPath: destinationPath,
+                    fileStrategy: fileStrategy,
+                    isDryRun: dryRun
+                )
             case .notRegularFile:
                 return
             }
@@ -150,7 +133,9 @@ public class Organiser {
         dateStrategy: DateGroupingStrategy,
         dryRun: Bool
     ) throws -> FileProcessingResult {
-        guard let fileAttributes = try fileHandler.resourceValues(of: url) else {
+        guard let fileAttributes = try fileHandler.resourceValues(of: url),
+            fileAttributes.isRegularFileOrPackage
+        else {
             return .notRegularFile
         }
 
