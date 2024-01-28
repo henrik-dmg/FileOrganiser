@@ -94,11 +94,21 @@ public class Organiser {
                 logger.logFileSkipped(at: url, reason: reason.description)
                 filesSkipped += 1
             case .written(let sourcePath, let destinationPath, let fileSize):
-                logger.logFileWritten(sourcePath: sourcePath, destinationPath: destinationPath, fileStrategy: fileStrategy)
+                logger.logFileAction(
+                    sourcePath: sourcePath,
+                    destinationPath: destinationPath,
+                    fileStrategy: fileStrategy,
+                    isDryRun: dryRun
+                )
                 filesWritten += 1
                 bytesWritten += fileSize ?? 0
             case .dryRun(let sourcePath, let destinationPath):
-                logger.logDryRun(sourcePath: sourcePath, destinationPath: destinationPath, fileStrategy: fileStrategy)
+                logger.logFileAction(
+                    sourcePath: sourcePath,
+                    destinationPath: destinationPath,
+                    fileStrategy: fileStrategy,
+                    isDryRun: dryRun
+                )
             case .notRegularFile:
                 return
             }

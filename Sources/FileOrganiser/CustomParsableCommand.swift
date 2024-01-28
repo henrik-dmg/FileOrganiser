@@ -14,8 +14,8 @@ extension CustomParsableCommand {
         if options.verbose {
             loggerOptions.insert(.verbose)
         }
-        if options.parseableOutput {
-            loggerOptions.insert(.parseableOutput)
+        if options.skipSummary {
+            loggerOptions.insert(.skipSummary)
         }
 
         let logger = Logger(options: loggerOptions)

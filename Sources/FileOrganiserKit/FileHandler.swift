@@ -1,6 +1,5 @@
 import Foundation
 import GlobPattern
-import ImageIO
 
 // MARK: - Protocol
 
