@@ -28,7 +28,7 @@ ln -s .build/release/file-organiser /usr/local/bin/file-organiser # or any other
 
 ## Usage
 
-The tool has two subcommands: `copy` and `move`. If you use `copy`, source files will remain in their original location. If you use `move`, source files will be moved to the target directory to you the original folder structure will be lost.
+The tool has two subcommands: `copy` and `move`. If you use `copy`, source files will remain in their original location. If you use `move`, source files will be moved to the target directory and the original folder structure will be lost.
 The options and arguments are the same for both.
 
 Example:
