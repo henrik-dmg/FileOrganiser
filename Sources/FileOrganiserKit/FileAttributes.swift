@@ -42,15 +42,15 @@ public struct FileAttributes {
     }
 
     #if DEBUG
-        init(
-            fileSizeInBytes: Int?,
-            creationDate: Date,
-            isRegularFileOrPackage: Bool
-        ) {
-            self.fileSizeInBytes = fileSizeInBytes
-            self.creationDate = creationDate
-            self.isRegularFileOrPackage = isRegularFileOrPackage
-        }
+    init(
+        fileSizeInBytes: Int?,
+        creationDate: Date,
+        isRegularFileOrPackage: Bool
+    ) {
+        self.fileSizeInBytes = fileSizeInBytes
+        self.creationDate = creationDate
+        self.isRegularFileOrPackage = isRegularFileOrPackage
+    }
     #endif
 
 }

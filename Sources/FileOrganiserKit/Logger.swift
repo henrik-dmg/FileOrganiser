@@ -14,10 +14,14 @@ public class Logger {
 
         /// Prints additional information during processing.
         public static let verbose = Options(rawValue: 1 << 0)
-        /// Enables or disables colored output
+
+        /// Enables or disables colored output.
         public static let coloredOutput = Options(rawValue: 1 << 1)
+
         /// Skips the summmary at the end of the run. Useful for parsing the output.
+        // swift-format-ignore: TrailingWhitespace
         public static let skipSummary = Options(rawValue: 1 << 1)
+
     }
 
     // MARK: - Properties
