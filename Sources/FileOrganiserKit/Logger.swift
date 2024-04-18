@@ -19,8 +19,8 @@ public class Logger {
         public static let coloredOutput = Options(rawValue: 1 << 1)
 
         /// Skips the summmary at the end of the run. Useful for parsing the output.
-        // swift-format-ignore: TrailingWhitespace
-        public static let skipSummary = Options(rawValue: 1 << 1)
+        //
+        public static let skipSummary = Options(rawValue: 1 << 2)
 
     }
 
