@@ -20,7 +20,13 @@ jobs:
       - name: Build
         run: swift build -v
       - name: Run tests
-        run: swift test -v
+        run: swift test --enable-code-coverage -v
+      - name: Convert coverage report
+        run: Scripts/convert-coverage-report --target FileOrganiserPackageTests
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   lint-code:
     name: Lint Swift Code

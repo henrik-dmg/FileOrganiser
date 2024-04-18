@@ -1,80 +1,105 @@
 import Foundation
 
-// MARK: - Protocol
+public class Logger {
 
-public protocol LoggerProtocol {
+    // MARK: - Nested Types
 
-    func logFileWritten(sourcePath: String, destinationPath: String, fileStrategy: FileHandlingStrategy)
-    func logDryRun(sourcePath: String, destinationPath: String, fileStrategy: FileHandlingStrategy)
-    func logFileSkipped(at url: URL, reason: String)
-    func logSummary(dryRun: Bool, filesProcessed: Int, filesWritten: Int, filesSkipped: Int, bytesWritten: Int)
-    func logError(message: String)
-    func logSoftError(message: String)
+    public struct Options: OptionSet {
 
-}
+        public let rawValue: UInt
 
-// MARK: - Default Implementation
+        public init(rawValue: UInt) {
+            self.rawValue = rawValue
+        }
 
-public struct Logger: LoggerProtocol, VerbosePrinteable {
+        /// Prints additional information during processing.
+        public static let verbose = Options(rawValue: 1 << 0)
+        /// Enables or disables colored output
+        public static let coloredOutput = Options(rawValue: 1 << 1)
+        /// Skips the summmary at the end of the run. Useful for parsing the output.
+        public static let skipSummary = Options(rawValue: 1 << 1)
+    }
 
     // MARK: - Properties
 
-    let verbose: Bool
+    let options: Options
+    let printer: Printer
 
     // MARK: - Init
 
-    public init(verbose: Bool) {
-        self.verbose = verbose
+    public convenience init(options: Options) {
+        self.init(options: options, printer: Printer(outputFileHandle: .standardOutput, errorFileHandle: .standardError))
+    }
+
+    init(options: Options, printer: Printer) {
+        self.options = options
+        self.printer = printer
     }
 
     // MARK: - Methods
 
-    public func logFileWritten(sourcePath: String, destinationPath: String, fileStrategy: FileHandlingStrategy) {
-        switch fileStrategy {
-        case .move:
-            printVerbose("Moved file from \(sourcePath) to \(destinationPath)")
-        case .copy:
-            printVerbose("Copied file from \(sourcePath) to \(destinationPath)")
-        }
-    }
+    public func logFileAction(sourcePath: String, destinationPath: String, fileStrategy: FileHandlingStrategy, isDryRun: Bool) {
+        let arrow = isDryRun ? "~>" : "->"
 
-    public func logDryRun(sourcePath: String, destinationPath: String, fileStrategy: FileHandlingStrategy) {
-        switch fileStrategy {
-        case .move:
-            printVerbose("Would move file from \(sourcePath) to \(destinationPath)")
-        case .copy:
-            printVerbose("Would copy file from \(sourcePath) to \(destinationPath)")
+        let logMessage =
+            switch fileStrategy {
+            case .move:
+                "MOVE |> \(sourcePath) \(arrow) \(destinationPath)"
+            case .copy:
+                "COPY |> \(sourcePath) \(arrow) \(destinationPath)"
+            }
+
+        if isDryRun {
+            printer.writeDefault(logMessage)
+        } else {
+            printVerbose(logMessage)
         }
     }
 
     public func logFileSkipped(at url: URL, reason: String) {
-        printVerbose("Skipping file at \(url.relativePath) (\(reason))".addingTerminalColor(.yellow))
+        printVerbose(
+            "SKIP |> \(url.relativePath) (\(reason))".addingTerminalStyling(color: options.contains(.coloredOutput) ? .yellow : nil)
+        )
     }
 
     public func logSummary(dryRun: Bool, filesProcessed: Int, filesWritten: Int, filesSkipped: Int, bytesWritten: Int) {
+        guard !options.contains(.skipSummary) else {
+            return
+        }
+
         if dryRun {
             let logMessage = """
                 SUCCESS |> Processed \(filesProcessed) files.
-                SUCCESS |> Dry run completed. No files were moved or copied.
+                        |> Dry run completed. No files were moved or copied.
                 """
-            print(logMessage.addingTerminalColor(.green))
+            printer.writeDefault(logMessage.addingTerminalStyling(color: options.contains(.coloredOutput) ? .green : nil))
         } else {
             let formatter = ByteCountFormatter()
             let bytesWrittenString = formatter.string(fromByteCount: Int64(bytesWritten))
             let logMessage = """
                 SUCCESS |> Processed \(filesProcessed) files.
-                SUCCESS |> Files written: \(filesWritten) files (\(bytesWrittenString)). \(filesSkipped) files skipped.
+                        |> Files written: \(filesWritten) files (\(bytesWrittenString)). \(filesSkipped) files skipped.
                 """
-            print(logMessage.addingTerminalColor(.green))
+            printer.writeDefault(logMessage.addingTerminalStyling(color: options.contains(.coloredOutput) ? .green : nil))
         }
     }
 
     public func logError(message: String) {
-        print("ERROR |> \(message)".addingTerminalStyling(color: .red, decoration: .bold))
+        printer.writeError("ERROR |> \(message)".addingTerminalStyling(color: options.contains(.coloredOutput) ? .red : nil))
     }
 
     public func logSoftError(message: String) {
-        print("NON-FATAL |> \(message)".addingTerminalStyling(color: .red, decoration: .bold))
+        printer.writeError("NON-FATAL |> \(message)".addingTerminalStyling(color: options.contains(.coloredOutput) ? .red : nil))
+    }
+
+    // MARK: - Helpers
+
+    private func printVerbose(_ string: String) {
+        guard options.contains(.verbose) else {
+            return
+        }
+
+        printer.writeDefault(string)
     }
 
 }
