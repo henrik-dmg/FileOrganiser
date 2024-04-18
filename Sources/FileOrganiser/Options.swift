@@ -35,4 +35,10 @@ struct Options: ParsableArguments {
     @Flag(help: "Keeps the tool running when a failure occurs for individual files")
     var softFail = false
 
+    @Flag(help: "Skips the summmary at the end of the run. Useful for parsing the output.")
+    var skipSummary = false
+
+    @Flag(inversion: .prefixedNo, help: "Enables or disables colored output")
+    var coloredOutput = true
+
 }
