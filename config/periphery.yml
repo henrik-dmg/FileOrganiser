@@ -2,4 +2,3 @@ targets:
   - FileOrganiser
   - FileOrganiserKit
   - FileOrganiserKitTests
-enable_unused_import_analysis: true

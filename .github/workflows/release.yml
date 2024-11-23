@@ -6,7 +6,7 @@ on:
 
 jobs:
   distribute_binaries:
-    runs-on: macos-13
+    runs-on: macos-latest
     strategy:
       matrix:
         platform: [arm64, x86_64]

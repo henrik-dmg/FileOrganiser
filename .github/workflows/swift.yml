@@ -15,7 +15,7 @@ on:
 jobs:
   test-swift:
     name: Test Swift Code
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - name: Configure Xcode
         uses: maxim-lobanov/setup-xcode@v1

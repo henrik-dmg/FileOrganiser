@@ -11,7 +11,7 @@ on:
 jobs:
   deploy-pages:
     name: Deploy Documentation to GitHub Pages
-    runs-on: macos-14
+    runs-on: macos-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
