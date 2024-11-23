@@ -2,13 +2,15 @@ name: Prettier
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
     paths:
       - "**/*.js"
       - "**/*.yml"
       - "**/*.md"
   pull_request:
-    branches: [main]
+    branches:
+      - main
     paths:
       - "**/*.js"
       - "**/*.yml"
@@ -17,16 +19,9 @@ on:
 jobs:
   prettier:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          # Make sure the actual branch is checked out when running on pull requests
-          ref: ${{ github.head_ref }}
-          # This is important to fetch the changes to the previous commit
-          fetch-depth: 0
-
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
         with:

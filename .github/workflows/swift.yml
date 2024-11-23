@@ -2,15 +2,18 @@ name: Swift
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - "Sources/**/*.swift"
       - "Tests/**/*.swift"
   pull_request:
-    branches: [main]
+    branches:
+      - main
     paths:
       - "Sources/**/*.swift"
       - "Tests/**/*.swift"
+  workflow_dispatch:
 
 jobs:
   test-swift:

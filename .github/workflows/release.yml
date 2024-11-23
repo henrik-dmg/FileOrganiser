@@ -2,7 +2,8 @@ name: Deployment
 
 on:
   release:
-    types: [created]
+    types:
+      - created
 
 jobs:
   distribute_binaries:
@@ -25,9 +26,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
       - name: Compile ${{ matrix.platform }} Binary
-        run: |
-          swift build -c release --arch ${{ matrix.platform }}
-          zip -j file-organiser-${{ matrix.platform }}.zip .build/${{ matrix.platform }}-apple-macosx/release/file-organiser
+        run: swift build -c release --arch ${{ matrix.platform }}
+      - name: Zip ${{ matrix.platform }} Binary
+        run: zip -j file-organiser-${{ matrix.platform }}.zip .build/${{ matrix.platform }}-apple-macosx/release/file-organiser
       - name: Upload ${{ matrix.platform }} Binary
         uses: actions/upload-release-asset@v1
         env:
