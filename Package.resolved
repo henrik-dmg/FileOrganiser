@@ -1,4 +1,5 @@
 {
+  "originHash" : "673c8b78a8406ccbec7ca6cc616a0827c7a1d364efe449ba857ef6af218968f7",
   "pins" : [
     {
       "identity" : "clifoundation",
@@ -15,7 +16,7 @@
       "location" : "https://github.com/ChimeHQ/GlobPattern",
       "state" : {
         "branch" : "main",
-        "revision" : "c7c3d7864b24543343d7cac9a27fab4ad17410a2"
+        "revision" : "468242542ae08e3a8f31ef0a81b00c069877645c"
       }
     },
     {
@@ -23,10 +24,10 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "c8ed701b513cf5177118a175d85fbbbcd707ab41",
-        "version" : "1.3.0"
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
