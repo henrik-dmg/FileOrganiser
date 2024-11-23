@@ -49,7 +49,7 @@ jobs:
 
   lint-code:
     name: Lint Swift Code
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - name: Configure Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -64,7 +64,7 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
-      - name: Install SwiftLint
+      - name: Install swift-format and Periphery
         run: brew install swift-format peripheryapp/periphery/periphery
       - name: Lint code
         run: Scripts/lint-swift-code
