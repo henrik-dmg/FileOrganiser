@@ -17,8 +17,8 @@ public protocol FileHandlerProtocol {
         includingPropertiesForKeys keys: [URLResourceKey]?,
         options mask: FileManager.DirectoryEnumerationOptions,
         shouldSoftFail: Bool,
-        callback: (URL) throws -> Void,
-        softFailCallback: (Error) -> Void
+        fileHandler: (URL) throws -> Void,
+        softFailHandler: (Error) -> Void
     ) throws
 
 }
@@ -71,8 +71,8 @@ public struct FileHandler: FileHandlerProtocol {
         includingPropertiesForKeys keys: [URLResourceKey]?,
         options mask: FileManager.DirectoryEnumerationOptions,
         shouldSoftFail: Bool,
-        callback: (URL) throws -> Void,
-        softFailCallback: (Error) -> Void
+        fileHandler: (URL) throws -> Void,
+        softFailHandler: (Error) -> Void
     ) throws {
         guard
             let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys, options: mask),
@@ -83,10 +83,10 @@ public struct FileHandler: FileHandlerProtocol {
 
         for case let fileURL as URL in enumerator {
             do {
-                try callback(fileURL)
+                try fileHandler(fileURL)
             } catch let error {
                 if shouldSoftFail {
-                    softFailCallback(error)
+                    softFailHandler(error)
                 } else {
                     throw error
                 }

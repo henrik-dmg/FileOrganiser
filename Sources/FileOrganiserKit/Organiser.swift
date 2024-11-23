@@ -114,7 +114,7 @@ public class Organiser {
             }
 
             filesProcessed += 1
-        } softFailCallback: { error in
+        } softFailHandler: { error in
             logger.logSoftError(message: error.localizedDescription)
         }
 

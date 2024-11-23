@@ -57,15 +57,15 @@ class FakeFileHandler: FileHandlerProtocol {
         includingPropertiesForKeys keys: [URLResourceKey]?,
         options mask: FileManager.DirectoryEnumerationOptions,
         shouldSoftFail: Bool,
-        callback: (URL) throws -> Void,
-        softFailCallback: (Error) -> Void
+        fileHandler: (URL) throws -> Void,
+        softFailHandler: (Error) -> Void
     ) throws {
         guard let fakeContentsOfDirectory else {
             XCTFail("fakeContentsOfDirectory should be set")
             return
         }
         for url in fakeContentsOfDirectory {
-            try callback(url)
+            try fileHandler(url)
         }
     }
 

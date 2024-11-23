@@ -104,7 +104,7 @@ final class FileHandlerTests: TemporaryFileTests {
             shouldSoftFail: false
         ) { url in
             enumeratedFiles.insert(url.relativePath)
-        } softFailCallback: { error in
+        } softFailHandler: { error in
             XCTFail(error.localizedDescription)
         }
 
@@ -126,7 +126,7 @@ final class FileHandlerTests: TemporaryFileTests {
                 shouldSoftFail: false
             ) { url in
                 XCTFail("Should not call process handler")
-            } softFailCallback: { error in
+            } softFailHandler: { error in
                 XCTFail(error.localizedDescription)
             }
         )
@@ -151,7 +151,7 @@ final class FileHandlerTests: TemporaryFileTests {
             shouldSoftFail: true
         ) { url in
             throw NSError(domain: "dev.panhans.FileOrganiserKitTests", code: 1000)
-        } softFailCallback: { error in
+        } softFailHandler: { error in
             hasThrownError = true
         }
 
