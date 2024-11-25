@@ -107,7 +107,7 @@ Example:
 
 Similar to `month`, but files will be moved into subfolders for each day as well.
 I guess this one is not very useful unless you create a lot of files every day.
-Specifying `month` will result in the following folder structure:
+Specifying `day` will result in the following folder structure:
 
 ```
 .

@@ -6,7 +6,7 @@ on:
       - created
 
 jobs:
-  distribute_binaries:
+  distribute-binaries:
     runs-on: macos-latest
     strategy:
       matrix:
